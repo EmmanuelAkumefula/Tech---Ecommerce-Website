@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eGadgets - Your Tech Destination</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Lighter, almost white background */
+            color: #1a202c; /* Darker text for better contrast */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Slate gray for thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Darker slate gray on hover */
+        }
+
+        /* Basic keyframe animations for flair */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceOnce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-fade-in-down { animation: fadeInDown 0.8s ease-out; }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out; }
+        .animate-bounce-once { animation: bounceOnce 0.6s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <div id="app" class="flex flex-col flex-grow">
+        <!-- Navigation Bar -->
+        <nav class="bg-gradient-to-r from-gray-800 to-gray-900 p-4 shadow-xl rounded-b-2xl">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                <a href="#" class="text-white text-3xl font-extrabold mb-4 md:mb-0 hover:text-indigo-400 transition-colors duration-300" onclick="navigateTo('home')">eGadgets</a>
+                <div class="flex flex-wrap justify-center space-x-4 md:space-x-8 text-lg font-medium">
+                    <a href="#" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-105" onclick="navigateTo('home')">Home</a>
+                    <a href="#" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-105" onclick="navigateTo('shop')">Shop</a>
+                    <a href="#" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-105" onclick="navigateTo('about')">About</a>
+                    <a href="#" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-105" onclick="navigateTo('contact')">Contact</a>
+                    <a href="#" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300 transform hover:scale-105 relative flex items-center" onclick="navigateTo('cart')">
+                        Cart (<span id="cart-item-count" class="ml-1 font-bold">0</span>)
+                        <!-- Cart Icon (Lucide-style SVG) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart ml-2">
+                            <circle cx="8" cy="21" r="1"></circle>
+                            <circle cx="19" cy="21" r="1"></circle>
+                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L23.94 8l-2.05-5.94h-8.89l-1.66-4.28-2.3-1.72z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="content-area" class="container mx-auto p-6 flex-grow">
+            <!-- Content will be rendered here by JavaScript -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-gray-300 p-6 mt-12 rounded-t-2xl shadow-xl">
+            <div class="container mx-auto text-center">
+                <p>&copy; 2025 eGadgets. All rights reserved.</p>
+                <div class="flex justify-center space-x-6 mt-4 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Custom Message Box (for all alerts) -->
+        <div id="message-box" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+            <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-95 opacity-0 border-t-4 border-blue-500">
+                <h3 id="message-title" class="text-2xl font-bold mb-4 text-gray-800 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info mr-2 text-blue-500"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    <span></span>
+                </h3>
+                <p id="message-content" class="text-gray-700 mb-6 text-center"></p>
+                <button onclick="hideMessage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-300 shadow-md transform hover:scale-105">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global State ---
+        let currentPage = 'home';
+        let cart = []; // Stores { product: {}, quantity: number }
+
+        /**
+         * Product data array.
+         * You can add, remove, or modify product objects here.
+         *
+         * @property {string} id - Unique identifier for the product.
+         * @property {string} name - Display name of the product.
+         * @property {number} price - Price of the product.
+         * @property {string} image - URL for the product image.
+         * IMPORTANT: Replace 'https://placehold.co/...' with your actual image URLs.
+         * @property {string} category - Category of the product (e.g., 'phone', 'ipad').
+         * @property {boolean} [featured=false] - True if product should appear in featured section.
+         * @property {boolean} [sale=false] - True if product is on sale.
+         * @property {boolean} [newInStock=false] - True if product is new in stock.
+         */
+        let products = [
+            { id: 'p1', name: 'iPhone 15 Pro Max', price: 1099.99, image: 'iphone 15 pro.jpeg', category: 'phone', featured: true, newInStock: true }, <!-- Replace with actual product image URL -->
+            { id: 'p2', name: 'Samsung Galaxy S24 Ultra', price: 999.99, image: 'Samsung Galaxy S24 Ultra.jpeg', category: 'phone', featured: true, sale: true }, <!-- Replace with actual product image URL -->
+            { id: 'p3', name: 'iPad Pro M4', price: 799.00, image: 'Ipad pro m4.png', category: 'ipad', featured: true, newInStock: true }, <!-- Replace with actual product image URL -->
+            { id: 'p4', name: 'MacBook Air M3', price: 1199.00, image: 'MacBook Air M3.png', category: 'laptop', featured: true }, <!-- Replace with actual product image URL -->
+            { id: 'p5', name: 'PlayStation 5', price: 499.99, image: 'ps5.png', category: 'console', featured: true, sale: true }, <!-- Replace with actual product image URL -->
+            { id: 'p6', name: 'Microsoft Surface Laptop 6', price: 999.00, image: 'MacBook Air M3.png', category: 'laptop' }, <!-- Replace with actual product image URL -->
+            { id: 'p7', name: 'Nintendo Switch OLED', price: 349.99, image: 'Nintendo Switch OLED .png', category: 'console' }, <!-- Replace with actual product image URL -->
+            { id: 'p8', name: 'Google Pixel 8 Pro', price: 899.00, image: 'pixel 8.png', category: 'phone' }, <!-- Replace with actual product image URL -->
+            { id: 'p9', name: 'iPad Air M2', price: 599.00, image: 'iPad Air M2 .png', category: 'ipad' }, <!-- Replace with actual product image URL -->
+            { id: 'p10', name: 'Dell XPS 15', price: 1599.00, image: 'Dell XPS 15 .png', category: 'laptop' }, <!-- Replace with actual product image URL -->
+        ];
+
+        const contentArea = document.getElementById('content-area');
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+        const messageBox = document.getElementById('message-box');
+        const messageTitle = document.getElementById('message-title');
+        const messageContent = document.getElementById('message-content');
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a custom message box instead of alert().
+         * @param {string} title - The title of the message.
+         * @param {string} content - The content of the message.
+         */
+        function showMessage(title, content) {
+            messageTitle.querySelector('span').textContent = title; // Update span inside h3
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            // Animate in
+            setTimeout(() => {
+                messageBox.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                messageBox.querySelector('div').classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        /**
+         * Hides the custom message box.
+         */
+        function hideMessage() {
+            messageBox.querySelector('div').classList.remove('scale-100', 'opacity-100');
+            messageBox.querySelector('div').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 300); // Allow animation to finish
+        }
+
+        /**
+         * Updates the item count displayed in the navigation bar cart.
+         */
+        function updateCartItemCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartItemCountSpan.textContent = totalItems;
+        }
+
+        /**
+         * Navigates to a different page and re-renders content.
+         * @param {string} pageName - The name of the page to navigate to ('home', 'shop', 'about', 'contact', 'cart', 'checkout', 'receipt').
+         * @param {string} [category=null] - Optional category to filter shop products.
+         */
+        function navigateTo(pageName, category = null) {
+            currentPage = pageName;
+            renderPage(category);
+            window.scrollTo(0, 0); // Scroll to top on page change
+        }
+
+        // --- Product Rendering Helper ---
+
+        /**
+         * Creates an HTML string for a single product card.
+         * @param {object} product - The product object.
+         * @returns {string} HTML string for the product card.
+         */
+        function createProductCard(product) {
+            return `
+                <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center relative border border-gray-100 transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-md mb-4 border border-gray-200">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${product.name}</h3>
+                    <p class="text-indigo-600 text-2xl font-bold mb-4">$${product.price.toFixed(2)}</p>
+                    ${product.sale ? '<span class="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full absolute top-4 left-4 shadow-md transform -rotate-6">SALE!</span>' : ''}
+                    ${product.newInStock ? '<span class="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full absolute top-4 right-4 shadow-md transform rotate-6">NEW!</span>' : ''}
+                    <button onclick="addToCart('${product.id}')" class="mt-auto bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center text-base">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle mr-2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                        Add to Cart
+                    </button>
+                </div>
+            `;
+        }
+
+        // --- Cart Management ---
+
+        /**
+         * Adds a product to the cart or increments its quantity.
+         * @param {string} productId - The ID of the product to add.
+         */
+        function addToCart(productId) {
+            const productToAdd = products.find(p => p.id === productId);
+            if (!productToAdd) return;
+
+            const existingItem = cart.find(item => item.product.id === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ product: productToAdd, quantity: 1 });
+            }
+            updateCartItemCount();
+            showMessage('Added to Cart', `${productToAdd.name} has been added to your cart.`);
+            if (currentPage === 'cart') renderCart(); // Re-render cart if on cart page
+        }
+
+        /**
+         * Changes the quantity of an item in the cart.
+         * @param {string} productId - The ID of the product.
+         * @param {number} change - The amount to change the quantity by (+1 or -1).
+         */
+        function changeQuantity(productId, change) {
+            const item = cart.find(item => item.product.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    renderCart();
+                }
+            }
+            updateCartItemCount();
+        }
+
+        /**
+         * Removes a product completely from the cart.
+         * @param {string} productId - The ID of the product to remove.
+         */
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.product.id !== productId);
+            updateCartItemCount();
+            renderCart();
+            showMessage('Removed from Cart', 'Product has been removed from your cart.');
+        }
+
+        /**
+         * Clears all items from the cart.
+         */
+        function clearCart() {
+            cart = [];
+            updateCartItemCount();
+            renderCart();
+        }
+
+        // --- Page Rendering Functions ---
+
+        /**
+         * Renders the Home page content.
+         */
+        function renderHome() {
+            const featuredProducts = products.filter(p => p.featured || p.sale || p.newInStock);
+            const categories = ['phone', 'ipad', 'laptop', 'console'];
+
+            contentArea.innerHTML = `
+                <section class="text-center py-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl shadow-xl mb-12 border border-blue-200">
+                    <h1 class="text-6xl font-extrabold text-gray-800 mb-6 animate-fade-in-down">Welcome to <span class="text-indigo-700">eGadgets</span>!</h1>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8 animate-fade-in-up">Your one-stop shop for the latest and greatest electronic gadgets.</p>
+                    <button onclick="navigateTo('shop')" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl transform hover:scale-105 transition-all duration-300 animate-bounce-once">
+                        Shop Now
+                    </button>
+                </section>
+
+                <section class="py-12">
+                    <h2 class="text-4xl font-bold text-gray-800 text-center mb-10">Featured Products</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        ${featuredProducts.map(createProductCard).join('')}
+                    </div>
+                </section>
+
+                <section class="py-12">
+                    <h2 class="text-4xl font-bold text-gray-800 text-center mb-10">Shop by Category</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        ${categories.map(category => `
+                            <div class="bg-white rounded-xl shadow-lg p-6 text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer border border-gray-100" onclick="navigateTo('shop', '${category}')">
+                                <img src="https://placehold.co/150x150/e0e7ff/4338ca?text=${category.charAt(0).toUpperCase() + category.slice(1)}" alt="${category}" class="mx-auto mb-4 rounded-full border-4 border-indigo-200 shadow-md">
+                                <h3 class="text-2xl font-semibold text-gray-800">${category.charAt(0).toUpperCase() + category.slice(1)}s</h3>
+                                <p class="text-gray-600 text-sm mt-2">Explore our collection</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        /**
+         * Renders the Shop page content, optionally filtered by category.
+         * @param {string} [category=null] - Optional category to filter products.
+         */
+        function renderShop(category = null) {
+            const filteredProducts = category ? products.filter(p => p.category === category) : products;
+            const categoryTitle = category ? category.charAt(0).toUpperCase() + category.slice(1) + 's' : 'All Gadgets';
+
+            contentArea.innerHTML = `
+                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">${categoryTitle}</h1>
+                <div class="mb-6 flex flex-wrap justify-center gap-4">
+                    <button onclick="navigateTo('shop', null)" class="px-6 py-3 rounded-full font-semibold transition-colors duration-300 shadow-md ${category === null ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">All</button>
+                    <button onclick="navigateTo('shop', 'phone')" class="px-6 py-3 rounded-full font-semibold transition-colors duration-300 shadow-md ${category === 'phone' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">Phones</button>
+                    <button onclick="navigateTo('shop', 'ipad')" class="px-6 py-3 rounded-full font-semibold transition-colors duration-300 shadow-md ${category === 'ipad' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">iPads</button>
+                    <button onclick="navigateTo('shop', 'laptop')" class="px-6 py-3 rounded-full font-semibold transition-colors duration-300 shadow-md ${category === 'laptop' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">Laptops</button>
+                    <button onclick="navigateTo('shop', 'console')" class="px-6 py-3 rounded-full font-semibold transition-colors duration-300 shadow-md ${category === 'console' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">Consoles</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    ${filteredProducts.length > 0 ? filteredProducts.map(createProductCard).join('') : '<p class="col-span-full text-center text-gray-600 text-xl py-10">No products found in this category.</p>'}
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the About Us page content.
+         */
+        function renderAbout() {
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-xl max-w-3xl mx-auto border border-gray-100">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">About eGadgets</h1>
+                    <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                        Welcome to <strong>eGadgets</strong>, your premier destination for cutting-edge electronics!
+                        Established in 2025, we are passionate about bringing the latest and most innovative
+                        gadgets directly to your fingertips. Our mission is to provide a seamless shopping
+                        experience, offering a curated selection of high-quality phones, iPads, laptops,
+                        consoles, and much more.
+                    </p>
+                    <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                        At eGadgets, we believe in connecting people with technology that enhances their lives.
+                        Whether you're a tech enthusiast, a professional, or just looking for the perfect gift,
+                        we have something for everyone. Our commitment to customer satisfaction means
+                        you can shop with confidence, knowing you're getting genuine products and reliable service.
+                    </p>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Thank you for choosing eGadgets. We look forward to serving all your tech needs!
+                    </p>
+                    <div class="flex justify-center mt-8">
+                        <img src="https://placehold.co/200x200/e0e7ff/4f46e5?text=eGadgets+Team" alt="eGadgets Team" class="rounded-full shadow-lg border-4 border-indigo-200">
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the Contact Us page content.
+         */
+        function renderContact() {
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-xl max-w-3xl mx-auto border border-gray-100">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Contact Us</h1>
+                    <p class="text-lg text-gray-700 mb-6 text-center">
+                        Have questions, feedback, or need assistance? Don't hesitate to reach out to us!
+                        Our dedicated customer support team is here to help.
+                    </p>
+                    <div class="mb-6 text-center">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Our Details:</h2>
+                        <p class="text-lg text-gray-700 mb-2 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail mr-2 text-indigo-500"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <strong class="font-medium">Email:</strong> support@egadgets.com
+                        </p>
+                        <p class="text-lg text-gray-700 mb-2 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone mr-2 text-indigo-500"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <strong class="font-medium">Phone:</strong> +1 (555) 123-4567
+                        </p>
+                        <p class="text-lg text-gray-700 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin mr-2 text-indigo-500"><path d="M12 18.33A7.5 7.5 0 1 0 5 12.83c0 4.29 7 9.5 7 9.5s7-5.21 7-9.5A7.5 7.5 0 1 0 12 18.33Z"/><circle cx="12" cy="10.83" r="2.5"/></svg>
+                            <strong class="font-medium">Address:</strong> 123 Tech Lane, Gadget City, TX 78701
+                        </p>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Send Us a Message:</h2>
+                    <form onsubmit="event.preventDefault(); showMessage('Message Sent!', 'Thank you for your message. We will get back to you shortly.'); this.reset();">
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Your Name:</label>
+                            <input type="text" id="name" name="name" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Your Email:</label>
+                            <input type="email" id="email" name="email" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-700 text-sm font-bold mb-2">Message:</label>
+                            <textarea id="message" name="message" rows="6" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the Cart page content.
+         */
+        function renderCart() {
+            const cartTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+            contentArea.innerHTML = `
+                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Your Shopping Cart</h1>
+                ${cart.length === 0 ? `
+                    <div class="bg-white p-8 rounded-xl shadow-xl text-center border border-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-x mx-auto mb-6 text-gray-400">
+                            <path d="M4 2H2v2h3l2.5 12L7 17h12l.5-4h-9.5"></path>
+                            <path d="m20 8-4 4"></path>
+                            <path d="m16 8 4 4"></path>
+                            <circle cx="8" cy="21" r="1"></circle>
+                            <circle cx="19" cy="21" r="1"></circle>
+                        </svg>
+                        <p class="text-xl text-gray-600 mb-6">Your cart is empty. Start shopping now!</p>
+                        <button onclick="navigateTo('shop')" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg">
+                            Go to Shop
+                        </button>
+                    </div>
+                ` : `
+                    <div class="bg-white p-6 rounded-xl shadow-xl mb-8 border border-gray-100">
+                        ${cart.map(item => `
+                            <div class="flex flex-col md:flex-row items-center justify-between border-b border-gray-200 py-4 last:border-b-0">
+                                <div class="flex items-center mb-4 md:mb-0 w-full md:w-auto">
+                                    <img src="${item.product.image}" alt="${item.product.name}" class="w-28 h-28 object-cover rounded-lg mr-4 border border-gray-100 shadow-sm">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-gray-800">${item.product.name}</h3>
+                                        <p class="text-gray-600">$${item.product.price.toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between w-full md:w-auto mt-4 md:mt-0">
+                                    <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                                        <button onclick="changeQuantity('${item.product.id}', -1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-3 transition-colors duration-200 rounded-l-lg focus:outline-none flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>
+                                        </button>
+                                        <span class="px-4 py-2 text-lg font-medium text-gray-800">${item.quantity}</span>
+                                        <button onclick="changeQuantity('${item.product.id}', 1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-3 transition-colors duration-200 rounded-r-lg focus:outline-none flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                                        </button>
+                                    </div>
+                                    <p class="text-xl font-bold text-indigo-700 ml-6">$${(item.product.price * item.quantity).toFixed(2)}</p>
+                                    <button onclick="removeFromCart('${item.product.id}')" class="ml-6 text-red-500 hover:text-red-700 transition-colors duration-300 p-2 rounded-full hover:bg-red-100 transform hover:scale-110">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+
+                        <div class="flex justify-between items-center mt-8 pt-4 border-t-2 border-gray-200">
+                            <h2 class="text-3xl font-bold text-gray-800">Total:</h2>
+                            <p class="text-4xl font-extrabold text-indigo-700">$${cartTotal.toFixed(2)}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+                            <button onclick="clearCart()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg">
+                                Clear Cart
+                            </button>
+                            <button onclick="navigateTo('checkout')" class="bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg">
+                                Proceed to Checkout
+                            </button>
+                        </div>
+                    </div>
+                `}
+            `;
+            updateCartItemCount();
+        }
+
+        /**
+         * Renders the Checkout page content (Payment and Delivery/Collection details).
+         */
+        function renderCheckout() {
+            if (cart.length === 0) {
+                showMessage('Cart Empty', 'Please add items to your cart before checking out.');
+                navigateTo('shop');
+                return;
+            }
+
+            const cartTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+            contentArea.innerHTML = `
+                <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Checkout</h1>
+                <div class="bg-white p-8 rounded-xl shadow-xl max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 border border-gray-100">
+                    <!-- Order Summary -->
+                    <div class="lg:order-2">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indigo-200">Order Summary</h2>
+                        <div class="space-y-3 mb-6 max-h-96 overflow-y-auto pr-2"> <!-- Added max-height and overflow for long carts -->
+                            ${cart.map(item => `
+                                <div class="flex justify-between items-center text-gray-700 text-base">
+                                    <span>${item.product.name} (x${item.quantity})</span>
+                                    <span>$${(item.product.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t-2 border-indigo-200 font-bold text-xl text-gray-800">
+                            <span>Total:</span>
+                            <span>$${cartTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment and Delivery/Collection Form -->
+                    <div class="lg:order-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indigo-200">Payment & Delivery Details</h2>
+                        <form id="checkout-form" class="space-y-6">
+                            <!-- Card Details -->
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card mr-2 text-indigo-500"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                    Card Information
+                                </h3>
+                                <div class="mb-4">
+                                    <label for="card-number" class="block text-gray-700 text-sm font-bold mb-2">Card Number:</label>
+                                    <input type="text" id="card-number" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="XXXX XXXX XXXX XXXX" required pattern="[0-9]{13,16}" title="Card number must be 13-16 digits">
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="expiry-date" class="block text-gray-700 text-sm font-bold mb-2">Expiry Date (MM/YY):</label>
+                                        <input type="text" id="expiry-date" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])\\/[0-9]{2}" title="Enter valid expiry date (MM/YY)">
+                                    </div>
+                                    <div>
+                                        <label for="cvv" class="block text-gray-700 text-sm font-bold mb-2">CVV:</label>
+                                        <input type="text" id="cvv" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="XXX" required pattern="[0-9]{3,4}" title="CVV must be 3 or 4 digits">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delivery/Collection Details -->
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck mr-2 text-indigo-500"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M10 18H5.5a2.5 2.5 0 0 1-2.5-2.5V14h6.5A2.5 2.5 0 0 1 12 16.5V18a2 2 0 1 1-4 0v-5"/></svg>
+                                    Delivery / Collection
+                                </h3>
+                                <div class="mb-4">
+                                    <label class="inline-flex items-center mr-6 cursor-pointer">
+                                        <input type="radio" name="delivery-option" value="delivery" checked class="form-radio text-indigo-600 h-5 w-5" onchange="toggleDeliveryFields(true)">
+                                        <span class="ml-2 text-lg text-gray-700">Delivery</span>
+                                    </label>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="radio" name="delivery-option" value="collection" class="form-radio text-indigo-600 h-5 w-5" onchange="toggleDeliveryFields(false)">
+                                        <span class="ml-2 text-lg text-gray-700">Collection</span>
+                                    </label>
+                                </div>
+
+                                <div id="delivery-fields">
+                                    <div class="mb-4">
+                                        <label for="full-name" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+                                        <input type="text" id="full-name" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="address" class="block text-gray-700 text-sm font-bold mb-2">Delivery Address:</label>
+                                        <input type="text" id="address" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label for="city" class="block text-gray-700 text-sm font-bold mb-2">City:</label>
+                                            <input type="text" id="city" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                        </div>
+                                        <div>
+                                            <label for="zip" class="block text-gray-700 text-sm font-bold mb-2">Zip/Postcode:</label>
+                                            <input type="text" id="zip" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="collection-details" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <p class="text-lg text-gray-700 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store mr-2 text-indigo-500"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.41 2h9.18a2 2 0 0 1 1.41.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M12 7v15"/></svg>You can collect your order from our store at:</p>
+                                    <p class="text-lg font-semibold text-gray-800 mt-2 ml-7">123 Tech Lane, Gadget City, TX 78701</p>
+                                    <p class="text-sm text-gray-500 mt-1 ml-7">Please bring your order confirmation email for collection.</p>
+                                </div>
+                                <div class="mb-4 mt-6">
+                                    <label for="email-receipt" class="block text-gray-700 text-sm font-bold mb-2">Email for Receipt:</label>
+                                    <input type="email" id="email-receipt" class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="your.email@example.com" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-full shadow-lg text-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle-2 mr-3"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                Confirm & Pay
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            // Add event listener for the form submission
+            document.getElementById('checkout-form').onsubmit = handlePayment;
+            // Ensure delivery fields are toggled correctly on initial load
+            toggleDeliveryFields(document.querySelector('input[name="delivery-option"]:checked').value === 'delivery');
+        }
+
+        /**
+         * Toggles the visibility of delivery-specific fields based on radio button selection.
+         * @param {boolean} isDelivery - True if delivery is selected, false for collection.
+         */
+        function toggleDeliveryFields(isDelivery) {
+            const deliveryFields = document.getElementById('delivery-fields');
+            const collectionDetails = document.getElementById('collection-details');
+            const deliveryInputs = deliveryFields.querySelectorAll('input');
+
+            if (isDelivery) {
+                deliveryFields.classList.remove('hidden');
+                collectionDetails.classList.add('hidden');
+                deliveryInputs.forEach(input => input.setAttribute('required', ''));
+            } else {
+                deliveryFields.classList.add('hidden');
+                collectionDetails.classList.remove('hidden');
+                deliveryInputs.forEach(input => input.removeAttribute('required'));
+            }
+        }
+
+        /**
+         * Handles the payment submission, simulates payment, and renders the receipt.
+         * @param {Event} event - The form submission event.
+         */
+        function handlePayment(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const fullName = document.getElementById('full-name').value;
+            const deliveryAddress = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const zip = document.getElementById('zip').value;
+            const receiptEmail = document.getElementById('email-receipt').value;
+            const deliveryOption = document.querySelector('input[name="delivery-option"]:checked').value;
+
+            // Basic client-side validation (browser's native HTML5 validation handles most)
+            const form = event.target;
+            if (!form.checkValidity()) {
+                showMessage('Validation Error', 'Please fill in all required fields correctly.');
+                return;
+            }
+
+            // Simulate payment processing (delay for realism)
+            showMessage('Processing Payment...', 'Your order is being processed. Please wait...');
+
+            setTimeout(() => {
+                const orderDetails = {
+                    items: cart.map(item => ({
+                        name: item.product.name,
+                        quantity: item.quantity,
+                        price: item.product.price,
+                        total: (item.product.price * item.quantity).toFixed(2)
+                    })),
+                    totalAmount: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0).toFixed(2),
+                    deliveryInfo: deliveryOption === 'delivery' ? {
+                        fullName: fullName,
+                        address: deliveryAddress,
+                        city: city,
+                        zip: zip,
+                        method: 'Delivery'
+                    } : {
+                        method: 'Collection',
+                        collectionPoint: '123 Tech Lane, Gadget City, TX 78701'
+                    },
+                    receiptEmail: receiptEmail,
+                    orderDate: new Date().toLocaleString()
+                };
+
+                // Store order details in session storage or local storage if needed for persistence
+                // For this example, we'll just pass it to the receipt page
+                sessionStorage.setItem('lastOrder', JSON.stringify(orderDetails));
+
+                hideMessage(); // Hide processing message
+                clearCart(); // Clear cart after successful "payment"
+                navigateTo('receipt'); // Navigate to receipt page
+            }, 2000); // Simulate 2-second payment processing time
+        }
+
+        /**
+         * Renders the Receipt page content after a successful "payment".
+         */
+        function renderReceipt() {
+            const orderDetails = JSON.parse(sessionStorage.getItem('lastOrder'));
+
+            if (!orderDetails) {
+                contentArea.innerHTML = `
+                    <div class="bg-white p-8 rounded-xl shadow-xl text-center border border-gray-100">
+                        <h1 class="text-4xl font-bold text-red-600 mb-6 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x mr-3"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                            Error!
+                        </h1>
+                        <p class="text-xl text-gray-600 mb-6">No order details found. Please go back to the shop and try again.</p>
+                        <button onclick="navigateTo('shop')" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg">
+                            Go to Shop
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const deliveryHtml = orderDetails.deliveryInfo.method === 'Delivery' ? `
+                <p class="flex items-center mb-2"><strong class="font-medium mr-2">Delivery To:</strong> ${orderDetails.deliveryInfo.fullName}</p>
+                <p class="ml-5">${orderDetails.deliveryInfo.address}, ${orderDetails.deliveryInfo.city}, ${orderDetails.deliveryInfo.zip}</p>
+            ` : `
+                <p class="flex items-center mb-2"><strong class="font-medium mr-2">Collection From:</strong></p>
+                <p class="ml-5">${orderDetails.deliveryInfo.collectionPoint}</p>
+                <p class="text-sm text-gray-500 mt-1 ml-5">Please bring your order confirmation for collection.</p>
+            `;
+
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-xl max-w-3xl mx-auto text-center border border-green-200">
+                    <h1 class="text-4xl font-bold text-green-600 mb-6 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle mr-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                        Payment Confirmed!
+                    </h1>
+                    <p class="text-xl text-gray-700 mb-8">Thank you for your purchase from eGadgets!</p>
+
+                    <div class="text-left border-t border-b border-gray-200 py-6 mb-8 bg-gray-50 rounded-lg p-4">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list mr-2 text-indigo-500"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                            Order Summary
+                        </h2>
+                        <p class="mb-2 flex items-center text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days mr-2 text-gray-500"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                            <strong class="font-medium">Order Date:</strong> ${orderDetails.orderDate}
+                        </p>
+                        <p class="mb-4 flex items-center text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail mr-2 text-gray-500"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <strong class="font-medium">Receipt Sent To:</strong> ${orderDetails.receiptEmail}
+                        </p>
+
+                        <div class="space-y-2">
+                            ${orderDetails.items.map(item => `
+                                <div class="flex justify-between text-gray-700 text-base">
+                                    <span>${item.name} (x${item.quantity})</span>
+                                    <span>$${item.total}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-200 mt-4 font-bold text-xl text-gray-800">
+                            <span>Grand Total:</span>
+                            <span>$${orderDetails.totalAmount}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-left mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map mr-2 text-indigo-500"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+                            Delivery / Collection Details
+                        </h2>
+                        ${deliveryHtml}
+                    </div>
+
+                    <button onclick="navigateTo('home')" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg transform hover:scale-105 transition-all duration-300">
+                        Back to Home
+                    </button>
+                </div>
+            `;
+
+            // Simulate sending email receipt (frontend only)
+            setTimeout(() => {
+                showMessage('Email Sent!', `A detailed receipt has been sent to ${orderDetails.receiptEmail}.`);
+            }, 1000);
+        }
+
+        /**
+         * Main function to render the appropriate page based on currentPage state.
+         * @param {string} [category=null] - Optional category for shop page.
+         */
+        function renderPage(category = null) {
+            switch (currentPage) {
+                case 'home':
+                    renderHome();
+                    break;
+                case 'shop':
+                    renderShop(category);
+                    break;
+                case 'about':
+                    renderAbout();
+                    break;
+                case 'contact':
+                    renderContact();
+                    break;
+                case 'cart':
+                    renderCart();
+                    break;
+                case 'checkout':
+                    renderCheckout();
+                    break;
+                case 'receipt':
+                    renderReceipt();
+                    break;
+                default:
+                    renderHome();
+            }
+        }
+
+        // Initial load: render the home page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPage();
+            updateCartItemCount(); // Ensure cart count is correct on load
+        });
+    </script>
+</body>
+</html>
